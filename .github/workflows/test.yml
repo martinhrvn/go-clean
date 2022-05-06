@@ -26,3 +26,9 @@ jobs:
         uses: codecov/codecov-action@v2.1.0
         with:
           files: ./coverage.txt
+      - uses: paambaati/codeclimate-action@v3.0.0
+        env:
+          CC_TEST_REPORTER_ID: f67d5962d5ed7dfcecacdf7aed265a30164b6aa00590a599dc9ac0bdf116d3ae
+        with:
+          coverageCommand: go test -coverprofile c.out -v ./...
+          prefix: github.com/martinhrvn/go-clean
