@@ -1,0 +1,34 @@
+{
+  "detectLeetSpeak": true,
+  "detectObfuscated": true,
+  "replacement": "*",
+  "obfuscationLength": 3,
+  "profanities": [
+    {
+      "regex": "f[u]+ck"
+    },
+    {
+      "word": "ass",
+      "level": 2
+    },
+    {
+      "word": "damn",
+        "level": 2,
+      "regex": "d[a]+mn"
+    },
+    {
+      "word": "bitch"
+    },
+    {
+    }
+  ],
+  "falsePositives": [
+    "bass"
+  ],
+  "falseNegatives": [
+    {
+      "word": "dumbass",
+      "level": 2
+    }
+  ]
+}
