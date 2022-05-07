@@ -13,6 +13,35 @@ var (
 	_       = json.Unmarshal(file, &config)
 )
 
+func TestGoClean_IsProfane(t *testing.T) {
+	tests := []struct {
+		name string
+		text string
+		want bool
+	}{
+		{"no profanity", "hello world", false},
+		{"profanity", "hello world fuck", true},
+		{"should match exact words", "ass", true},
+		{"regex", "fuuuuck", true},
+		{"should match obfuscated words", "a.s.s", true},
+		{"should match obfuscated words", "a  s  s", true},
+		{"should not match obfuscated words with length > set value", "a....s....s", false},
+		{"should match leet speak", "4$$", true},
+		{"should match leet speak and obfuscation", "a.$.$", true},
+		{"should match false negatives", "dumbass", true},
+		{"should match false positive", "bass", false},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			gc := NewProfanitySanitizer(config)
+			got := gc.IsProfane(test.text)
+			if got != test.want {
+				t.Errorf("got %t, want %t", got, test.want)
+			}
+		})
+	}
+}
+
 func TestGoClean_Redact(t *testing.T) {
 	tests := []struct {
 		name string
