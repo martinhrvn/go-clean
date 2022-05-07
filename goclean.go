@@ -2,7 +2,9 @@ package goclean
 
 import (
 	"regexp"
+	"strings"
 	"unicode"
+	"unicode/utf8"
 
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
@@ -64,22 +66,17 @@ func (gc GoClean) detectConcerns(message string, matchers []WordMatcher, matched
 
 func (gc *GoClean) Redact(str string) string {
 	redacted := sanitizeString(str)
-	for _, profanity := range gc.config.Profanities {
-		if profanity.Matcher != nil {
-			redacted = profanity.Matcher.ReplaceAllStringFunc(redacted, func(s string) string {
-				str := ""
-				for i := 0; i < len(s); i++ {
-					str += gc.config.Replacement
-				}
-				return str
-			})
-		}
+	detected := gc.List(redacted)
+	for _, concern := range detected {
+		redacted = redacted[:concern.StartIndex] + replace(concern.MatchedText, gc.config.Replacement) + redacted[concern.EndIndex:]
 	}
 	return redacted
 }
 
-func (gc *GoClean) IsProfane() bool {
-	return false
+func (gc *GoClean) IsProfane(str string) bool {
+	redacted := sanitizeString(str)
+	detected := gc.List(redacted)
+	return len(detected) > 0
 }
 
 func NewProfanitySanitizer(c Config) GoClean {
@@ -111,4 +108,8 @@ func isAlreadyMatched(start, end int, matched map[int]bool) bool {
 	_, startFound := matched[start]
 	_, endFound := matched[end]
 	return startFound || endFound
+}
+
+func replace(str string, replaceChar string) string {
+	return strings.Repeat(replaceChar, utf8.RuneCountInString(str))
 }

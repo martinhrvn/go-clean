@@ -28,8 +28,8 @@ func TestGoClean_Redact(t *testing.T) {
 		{"should not match obfuscated words with length > set value", "a....s....s", "a....s....s"},
 		{"should match leet speak", "4$$", "***"},
 		{"should match leet speak and obfuscation", "a.$.$", "*****"},
-		//{"should match false negatives", "dumbass", "******"},
-		//{"should match false positive", "bass", "bass"},
+		{"should match false negatives", "dumbass", "*******"},
+		{"should match false positive", "bass", "bass"},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
