@@ -13,7 +13,7 @@
     },
     {
       "word": "damn",
-        "level": 2,
+      "level": 2,
       "regex": "d[a]+mn"
     },
     {
