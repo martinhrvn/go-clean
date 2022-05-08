@@ -1,16 +1,8 @@
 package goclean
 
 import (
-	"encoding/json"
-	"io/ioutil"
 	"reflect"
 	"testing"
-)
-
-var (
-	file, _ = ioutil.ReadFile("config.json")
-	config  = Config{}
-	_       = json.Unmarshal(file, &config)
 )
 
 func TestGoClean_IsProfane(t *testing.T) {
@@ -33,8 +25,7 @@ func TestGoClean_IsProfane(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			gc := NewProfanitySanitizer(config)
-			got := gc.IsProfane(test.text)
+			got := IsProfane(test.text)
 			if got != test.want {
 				t.Errorf("got %t, want %t", got, test.want)
 			}
@@ -62,8 +53,7 @@ func TestGoClean_Redact(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			gc := NewProfanitySanitizer(config)
-			got := gc.Redact(test.text)
+			got := Redact(test.text)
 			if got != test.want {
 				t.Errorf("got %s, want %s", got, test.want)
 			}
@@ -95,8 +85,7 @@ func TestGoClean_List(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			gc := NewProfanitySanitizer(config)
-			got := gc.List(test.text)
+			got := List(test.text)
 			if !reflect.DeepEqual(got, test.want) {
 				t.Errorf("got %v, want %v", got, test.want)
 			}
