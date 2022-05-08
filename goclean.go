@@ -11,6 +11,8 @@ import (
 	"golang.org/x/text/unicode/norm"
 )
 
+var gc = NewProfanitySanitizer(DefaultConfig())
+
 type GoClean struct {
 	config Config
 }
@@ -68,7 +70,7 @@ func (gc *GoClean) Redact(str string) string {
 	redacted := sanitizeString(str)
 	detected := gc.List(redacted)
 	for _, concern := range detected {
-		redacted = redacted[:concern.StartIndex] + replace(concern.MatchedText, gc.config.Replacement) + redacted[concern.EndIndex:]
+		redacted = redacted[:concern.StartIndex] + replace(concern.MatchedText, gc.config.ReplacementCharacter) + redacted[concern.EndIndex:]
 	}
 	return redacted
 }
@@ -79,12 +81,24 @@ func (gc *GoClean) IsProfane(str string) bool {
 	return len(detected) > 0
 }
 
-func NewProfanitySanitizer(c Config) GoClean {
+func NewProfanitySanitizer(c *Config) GoClean {
 	c.Profanities = c.initializeMatchers(c.Profanities)
 	c.FalseNegatives = c.initializeMatchers(c.FalseNegatives)
 	return GoClean{
-		config: c,
+		config: *c,
 	}
+}
+
+func Redact(str string) string {
+	return gc.Redact(str)
+}
+
+func List(str string) []DetectedConcern {
+	return gc.List(str)
+}
+
+func IsProfane(str string) bool {
+	return gc.IsProfane(str)
 }
 
 func sanitizeString(message string) string {

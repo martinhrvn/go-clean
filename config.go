@@ -1,7 +1,9 @@
 package goclean
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"regexp"
 	"strings"
 )
@@ -14,10 +16,10 @@ type WordMatcher struct {
 }
 
 type Config struct {
-	DetectLeetSpeak   bool   `json:"detectLeetSpeak"`
-	DetectObfuscated  bool   `json:"detectObfuscated"`
-	Replacement       string `json:"replacement"`
-	ObfuscationLength int32  `json:"obfuscationLength,default=3"`
+	DetectLeetSpeak      bool   `json:"detectLeetSpeak"`
+	DetectObfuscated     bool   `json:"detectObfuscated"`
+	ReplacementCharacter string `json:"replacementCharacter"`
+	ObfuscationLength    int32  `json:"obfuscationLength,default=3"`
 
 	Profanities    []WordMatcher `json:"profanities"`
 	FalsePositives []string      `json:"falsePositives"`
@@ -62,4 +64,11 @@ func (c *Config) replaceLeetSpeak(chars []string) {
 			}
 		}
 	}
+}
+
+func DefaultConfig() *Config {
+	file, _ := ioutil.ReadFile("config.json")
+	config := &Config{}
+	_ = json.Unmarshal(file, config)
+	return config
 }
