@@ -13,10 +13,13 @@ import (
 
 var gc = NewProfanitySanitizer(DefaultConfig())
 
-type GoClean struct {
+// ProfanitySanitizer contains the dictionaries as well as the configuration
+// for determining how profanity detection is handled
+type ProfanitySanitizer struct {
 	config Config
 }
 
+// DetectedConcern contains details about detected profanity (matched text, base word, start, end index and optional level).
 type DetectedConcern struct {
 	Word        string
 	MatchedText string
@@ -25,7 +28,8 @@ type DetectedConcern struct {
 	Level       int32
 }
 
-func (gc *GoClean) List(message string) []DetectedConcern {
+// List takes in a string (word or sentence) and returns list of DetectedConcern.
+func (gc *ProfanitySanitizer) List(message string) []DetectedConcern {
 	str := sanitizeString(message)
 	detected := make([]DetectedConcern, 0)
 	matched := make(map[int]bool)
@@ -42,7 +46,7 @@ func (gc *GoClean) List(message string) []DetectedConcern {
 	return detected
 }
 
-func (gc GoClean) detectConcerns(message string, matchers []WordMatcher, matched map[int]bool) []DetectedConcern {
+func (gc ProfanitySanitizer) detectConcerns(message string, matchers []WordMatcher, matched map[int]bool) []DetectedConcern {
 	detected := make([]DetectedConcern, 0)
 	for _, profanity := range matchers {
 		if profanity.Matcher != nil {
@@ -66,7 +70,8 @@ func (gc GoClean) detectConcerns(message string, matchers []WordMatcher, matched
 	return detected
 }
 
-func (gc *GoClean) Redact(str string) string {
+// Redact takes in a string (word or sentence) and tries to censor all profanities found.
+func (gc *ProfanitySanitizer) Redact(str string) string {
 	redacted := sanitizeString(str)
 	detected := gc.List(redacted)
 	for _, concern := range detected {
@@ -75,28 +80,39 @@ func (gc *GoClean) Redact(str string) string {
 	return redacted
 }
 
-func (gc *GoClean) IsProfane(str string) bool {
+// IsProfane checks whether there are any profanities in a given string (word or sentence).
+func (gc *ProfanitySanitizer) IsProfane(str string) bool {
 	redacted := sanitizeString(str)
 	detected := gc.List(redacted)
 	return len(detected) > 0
 }
 
-func NewProfanitySanitizer(c *Config) GoClean {
+// NewProfanitySanitizer creates a new ProfanitySanitizer with the provided Config.
+func NewProfanitySanitizer(c *Config) ProfanitySanitizer {
 	c.Profanities = c.initializeMatchers(c.Profanities)
 	c.FalseNegatives = c.initializeMatchers(c.FalseNegatives)
-	return GoClean{
+	return ProfanitySanitizer{
 		config: *c,
 	}
 }
 
+// Redact takes in a string (word or sentence) and tries to censor all profanities found.
+//
+// Uses the default ProfanitySanitizer
 func Redact(str string) string {
 	return gc.Redact(str)
 }
 
+// List takes in a string (word or sentence) and returns list of DetectedConcern.
+//
+// Uses the default ProfanitySanitizer
 func List(str string) []DetectedConcern {
 	return gc.List(str)
 }
 
+// IsProfane checks whether there are any profanities in a given string (word or sentence).
+//
+// Uses the default ProfanityDetector
 func IsProfane(str string) bool {
 	return gc.IsProfane(str)
 }
