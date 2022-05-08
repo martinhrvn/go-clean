@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// WordMatcher is a struct that contains the word or regex to be matched and the level of the word.
 type WordMatcher struct {
 	Word    string `json:"word,omitempty"`
 	Regex   string `json:"regex,omitempty"`
@@ -15,6 +16,7 @@ type WordMatcher struct {
 	Matcher *regexp.Regexp
 }
 
+// Config is a struct that contains the configuration for the profanity sanitizer.
 type Config struct {
 	DetectLeetSpeak      bool   `json:"detectLeetSpeak"`
 	DetectObfuscated     bool   `json:"detectObfuscated"`
@@ -66,6 +68,7 @@ func (c *Config) replaceLeetSpeak(chars []string) {
 	}
 }
 
+// DefaultConfig is the default configuration for the profanity sanitizer.
 func DefaultConfig() *Config {
 	file, _ := ioutil.ReadFile("config.json")
 	config := &Config{}
