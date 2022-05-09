@@ -51,12 +51,11 @@ func TestGoClean_Redact(t *testing.T) {
 		{"should match false negatives", "dumbass", "*******"},
 		{"should match false positive", "bass", "bass"},
 		{"should handle multi-byte characters case insensitive", "世界 世界 ASS 世界", "世界 世界 *** 世界"},
-		//{"should sanitize special characters", "ûûû fûçk", "uuu ****"}, // todo: return original characters for non-redacted portion
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			got := Redact(test.text)
-			if got != test.want {
+			if !reflect.DeepEqual(got, test.want) {
 				t.Errorf("got %s, want %s", got, test.want)
 			}
 		})
