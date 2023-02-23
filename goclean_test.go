@@ -50,11 +50,12 @@ func TestGoClean_Redact(t *testing.T) {
 		{"should match leet speak and obfuscation", "a.$.$", "*****"},
 		{"should match false negatives", "dumbass", "*******"},
 		{"should match false positive", "bass", "bass"},
+		{"should handle multi-byte characters case insensitive", "世界 世界 ASS 世界", "世界 世界 *** 世界"},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			got := Redact(test.text)
-			if got != test.want {
+			if !reflect.DeepEqual(got, test.want) {
 				t.Errorf("got %s, want %s", got, test.want)
 			}
 		})
